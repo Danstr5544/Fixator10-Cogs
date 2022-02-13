@@ -57,6 +57,9 @@ log.debug(f"using {AVATAR_FORMAT} avatar format")
 async def non_global_bank(ctx):
     return not await bank.is_global()
 
+def getMD5(content):
+    return hashlib.md5(content.encode()).hexdigest()
+
 
 class Leveler(commands.Cog):
     """A level up thing with image generation!"""
@@ -3364,10 +3367,7 @@ class Leveler(commands.Cog):
         result.save(file, "PNG", quality=100)
         file.seek(0)
         return file
-    
-    def getMD5(content):
-        return hashlib.md5(content.encode()).hexdigest()
-     
+
     @commands.Cog.listener("on_message_without_command")
     async def _handle_on_message(self, message):
         if not self._db_ready:
