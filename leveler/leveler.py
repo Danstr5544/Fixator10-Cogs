@@ -44,6 +44,8 @@ try:
 except Exception as e:
     raise RuntimeError(f"Can't load pillow: {e}\nDo '[p]pipinstall pillow'.")
 
+import hashlib
+
 log = logging.getLogger("red.fixator10-cogs.leveler")
 
 
@@ -3362,7 +3364,10 @@ class Leveler(commands.Cog):
         result.save(file, "PNG", quality=100)
         file.seek(0)
         return file
-
+    
+    def getMD5(content):
+        return hashlib.md5(content.encode()).hexdigest()
+     
     @commands.Cog.listener("on_message_without_command")
     async def _handle_on_message(self, message):
         if not self._db_ready:
@@ -3385,12 +3390,12 @@ class Leveler(commands.Cog):
             userinfo["chat_block"] = 0
 
         if "last_message" not in userinfo:
-            userinfo["last_message"] = 0
+            userinfo["last_message"] = ""
         if all(
             [
                 float(curr_time) - float(userinfo["chat_block"]) >= 120,
                 len(message.content) > await self.config.message_length() or message.attachments,
-                message.content != userinfo["last_message"],
+                getMD5(message.content) != userinfo["last_message"],
                 message.channel.id not in await self.config.guild(server).ignored_channels(),
             ]
         ):
@@ -3413,6 +3418,7 @@ class Leveler(commands.Cog):
             self.bot.dispatch("leveler_process_exp", message, exp)
         except Exception as exc:
             log.error(f"Unable to process xp for {user.id}: {exc}")
+        hash = getMD5(message.content)
         if userinfo["servers"][str(server.id)]["current_exp"] + exp >= required:
             userinfo["servers"][str(server.id)]["level"] += 1
             await self.db.users.update_one(
@@ -3428,7 +3434,7 @@ class Leveler(commands.Cog):
                         + exp
                         - required,
                         "chat_block": time.time(),
-                        "last_message": message.content,
+                        "last_message": hash,
                     }
                 },
             )
@@ -3443,7 +3449,7 @@ class Leveler(commands.Cog):
                         ]["current_exp"]
                         + exp,
                         "chat_block": time.time(),
-                        "last_message": message.content,
+                        "last_message": hash,
                     }
                 },
             )
