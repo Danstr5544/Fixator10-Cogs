@@ -241,8 +241,8 @@ class Leveler(commands.Cog):
             name="Badges:",
             value=(", ".join(userinfo["badges"]).replace("_", " ") or None),
         )
-        em.set_author(name="Profile for {}".format(user.name), url=user.avatar_url)
-        em.set_thumbnail(url=user.avatar_url)
+        em.set_author(name="Profile for {}".format(user.name), url=user.avatar.url)
+        em.set_thumbnail(url=user.avatar.url)
         return em
 
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -296,8 +296,8 @@ class Leveler(commands.Cog):
         em.add_field(name="Reps", value=userinfo["rep"])
         em.add_field(name="Server Level", value=userinfo["servers"][str(server.id)]["level"])
         em.add_field(name="Server Exp", value=await self._find_server_exp(user, server))
-        em.set_author(name="Rank & Statistics for {}".format(user.name), url=user.avatar_url)
-        em.set_thumbnail(url=user.avatar_url)
+        em.set_author(name="Rank & Statistics for {}".format(user.name), url=user.avatar.url)
+        em.set_thumbnail(url=user.avatar.url)
         return em
 
     # should the user be mentioned based on settings?
@@ -339,7 +339,7 @@ class Leveler(commands.Cog):
                 footer_text = "Your Rank: {}                  {}: {}".format(
                     await self._find_global_rep_rank(user), board_type, user_stat
                 )
-                icon_url = self.bot.user.avatar_url
+                icon_url = self.bot.user.avatar.url
             elif "-global" in options:
                 title = "Global Exp Leaderboard for {}\n".format(self.bot.user.name)
                 async for userinfo in self.db.users.find({}):
@@ -355,7 +355,7 @@ class Leveler(commands.Cog):
                 footer_text = "Your Rank: {}                  {}: {}".format(
                     await self._find_global_rank(user), board_type, user_stat
                 )
-                icon_url = self.bot.user.avatar_url
+                icon_url = self.bot.user.avatar.url
             elif "-rep" in options:
                 title = "Rep Leaderboard for {}\n".format(server.name)
                 async for userinfo in self.db.users.find({}):
@@ -560,7 +560,7 @@ class Leveler(commands.Cog):
         em = discord.Embed(description=msg, colour=user.colour)
         em.set_author(
             name="Profile Information for {}".format(user.name),
-            icon_url=user.avatar_url,
+            icon_url=user.avatar.url,
         )
         await ctx.send(embed=em)
 
@@ -1551,7 +1551,7 @@ class Leveler(commands.Cog):
             serverid = server.id
         elif badge_type.casefold() == "global":
             servername = "Global"
-            icon_url = self.bot.user.avatar_url
+            icon_url = self.bot.user.avatar.url
             serverid = "global"
         else:
             await ctx.send("**Invalid Badge Type. Must be `server` or `global`.**")
@@ -1635,7 +1635,7 @@ class Leveler(commands.Cog):
         counter = 1
         for page in pagify(badge_ranks, ["\n"]):
             em.description = page
-            em.set_author(name="Badges for {}".format(user.name), icon_url=user.avatar_url)
+            em.set_author(name="Badges for {}".format(user.name), icon_url=user.avatar.url)
             em.set_footer(text="Page {} of {}".format(counter, total_pages))
             embeds.append(em)
             counter += 1
@@ -2395,19 +2395,19 @@ class Leveler(commands.Cog):
         if bg_type.lower() == "profile":
             em.set_author(
                 name="Profile Backgrounds for {}".format(self.bot.user.name),
-                icon_url=self.bot.user.avatar_url,
+                icon_url=self.bot.user.avatar.url,
             )
             bg_key = "profile"
         elif bg_type.lower() == "rank":
             em.set_author(
                 name="Rank Backgrounds for {}".format(self.bot.user.name),
-                icon_url=self.bot.user.avatar_url,
+                icon_url=self.bot.user.avatar.url,
             )
             bg_key = "rank"
         elif bg_type.lower() == "levelup":
             em.set_author(
                 name="Level Up Backgrounds for {}".format(self.bot.user.name),
-                icon_url=self.bot.user.avatar_url,
+                icon_url=self.bot.user.avatar.url,
             )
             bg_key = "levelup"
         else:
@@ -2628,7 +2628,7 @@ class Leveler(commands.Cog):
             profile_background = BytesIO(image)
         profile_avatar = BytesIO()
         try:
-            await user.avatar_url_as(format=AVATAR_FORMAT).save(profile_avatar, seek_begin=True)
+            await user.avatar.url_as(format=AVATAR_FORMAT).save(profile_avatar, seek_begin=True)
         except discord.HTTPException:
             profile_avatar = f"{bundled_data_path(self)}/defaultavatar.png"
 
@@ -3062,7 +3062,7 @@ class Leveler(commands.Cog):
         rank_background = BytesIO(image)
         rank_avatar = BytesIO()
         try:
-            await user.avatar_url_as(format=AVATAR_FORMAT).save(rank_avatar, seek_begin=True)
+            await user.avatar.url_as(format=AVATAR_FORMAT).save(rank_avatar, seek_begin=True)
         except discord.HTTPException:
             rank_avatar = f"{bundled_data_path(self)}/defaultavatar.png"
 
@@ -3276,7 +3276,7 @@ class Leveler(commands.Cog):
         level_background = BytesIO(image)
         level_avatar = BytesIO()
         try:
-            await user.avatar_url_as(format=AVATAR_FORMAT).save(level_avatar, seek_begin=True)
+            await user.avatar.url_as(format=AVATAR_FORMAT).save(level_avatar, seek_begin=True)
         except discord.HTTPException:
             level_avatar = f"{bundled_data_path(self)}/defaultavatar.png"
 
