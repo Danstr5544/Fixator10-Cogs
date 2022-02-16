@@ -3062,7 +3062,7 @@ class Leveler(commands.Cog):
         rank_background = BytesIO(image)
         rank_avatar = BytesIO()
         try:
-            await user.avatar.url_as(format=AVATAR_FORMAT).save(rank_avatar, seek_begin=True)
+            await user.avatar.url(format=AVATAR_FORMAT).save(rank_avatar, seek_begin=True)
         except discord.HTTPException:
             rank_avatar = f"{bundled_data_path(self)}/defaultavatar.png"
 
